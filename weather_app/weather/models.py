@@ -24,7 +24,9 @@ class WeatherReport:
         is_day = data_dict["current"]["is_day"] == 1
         city = data_dict["location"]["name"]
         # return the bluePrint of the request
-        return cls(temperature, condtion, is_day, city)
+        return cls(
+            temperature=temperature, condition=condtion, is_day=is_day, city=city
+        )
 
     def __str__(self):
         return f"{self.city}: {self.temperature}°C ({self.condition}) {self.is_day}"
