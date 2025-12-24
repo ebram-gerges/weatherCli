@@ -1,3 +1,9 @@
+from datetime import datetime
+
+from database import Base
+from sqlalchemy import Column, DateTime, Float, Integer, String
+
+
 class WeatherReport:
     """
     this class will give us the data we need to send to the ui
@@ -30,3 +36,17 @@ class WeatherReport:
 
     def __str__(self):
         return f"{self.city}: {self.temperature}°C ({self.condition}) {self.is_day}"
+
+
+# --- 2. The Database Table (Saves data to Postgres) ---
+class SearchHistory(Base):
+    """this is the search history class that we need to use with query
+    it inhirits from the base sqlalchmely Base"""
+
+    __tablename__ = "weather_history"
+
+    id = Column(Integer, primary_key=True)
+    city = Column(String)
+    temperature = Column(Float)
+    condition = Column(String)
+    searched_at = Column(DateTime, default=datetime.now)

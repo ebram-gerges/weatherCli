@@ -1,6 +1,5 @@
 import requests
-
-from models import WeatherReport
+from weather.models import WeatherReport
 
 
 class WeatherClient:
