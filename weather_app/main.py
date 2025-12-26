@@ -14,8 +14,6 @@ from weather.controller import WeatherController
 from weather.storage import WeatherStorage
 from weather.ui import WeatherDisplay
 
-DatabaseManager = WeatherStorage
-
 taskC = TaskController()
 console = Console()
 weatherC = WeatherController()
