@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User API Console</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: #0f1115;
+            color: #e8eaed;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            padding: 24px;
+        }
+        .wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #16191f;
+            border: 1px solid #242a33;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+        }
+        h1 { margin: 0 0 8px; font-size: 1.8rem; }
+        p.sub { margin: 0 0 20px; color: #9aa4b5; }
+        .grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; }
+        .card {
+            background: #1b1f26;
+            border: 1px solid #242a33;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        .card h2 { margin: 0 0 12px; font-size: 1.1rem; }
+        label { display: block; font-size: 0.85rem; color: #9aa4b5; margin-bottom: 6px; }
+        input, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #2c3340;
+            background: #11141a;
+            color: #e8eaed;
+            font-size: 0.95rem;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+        input:focus, textarea:focus { outline: none; border-color: #4aa8ff; box-shadow: 0 0 0 3px rgba(74,168,255,0.15); }
+        textarea { resize: vertical; min-height: 80px; }
+        .row { display: flex; gap: 10px; }
+        .row .field { flex: 1; }
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #4aa8ff, #2c8ddf);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            margin-top: 6px;
+        }
+        button:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(74,168,255,0.35); }
+        button:active { transform: translateY(0); }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px 8px; text-align: left; font-size: 0.95rem; }
+        th { color: #9aa4b5; font-weight: 600; border-bottom: 1px solid #242a33; }
+        tr + tr td { border-top: 1px solid #1f2530; }
+        .pill { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; }
+        .pill.ok { background: rgba(74,168,255,0.15); color: #8ed0ff; border: 1px solid rgba(74,168,255,0.4); }
+        .pill.muted { background: rgba(255,255,255,0.06); color: #b5bdc9; border: 1px solid rgba(255,255,255,0.1); }
+        .status { margin-top: 10px; padding: 10px 12px; border-radius: 10px; display: none; }
+        .status.ok { display: block; background: #12301f; color: #8ef1b5; border: 1px solid #1f7040; }
+        .status.err { display: block; background: #311616; color: #ff9b9b; border: 1px solid #5e2222; }
+        .skeleton { height: 14px; background: linear-gradient(90deg, #1c2027 0%, #20252d 50%, #1c2027 100%); background-size: 200% 100%; animation: pulse 1.1s infinite; border-radius: 6px; }
+        @keyframes pulse { to { background-position: -200% 0; } }
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>User API Console</h1>
+    <p class="sub">Register a user (POST) and list all users (GET) using the provided APIs.</p>
+
+    <div class="grid">
+        <div class="card">
+            <h2>Register User</h2>
+            <div class="row">
+                <div class="field">
+                    <label for="firstName">First Name</label>
+                    <input id="firstName" placeholder="Jane" autocomplete="off" />
+                </div>
+                <div class="field">
+                    <label for="lastName">Last Name</label>
+                    <input id="lastName" placeholder="Doe" autocomplete="off" />
+                </div>
+            </div>
+            <div class="field" style="margin-top: 10px;">
+                <label for="username">Username</label>
+                <input id="username" placeholder="jane_doe" autocomplete="off" />
+            </div>
+            <div class="field" style="margin-top: 10px;">
+                <label for="email">Email</label>
+                <input id="email" type="email" placeholder="jane@example.com" autocomplete="off" />
+            </div>
+            <div class="field" style="margin-top: 10px;">
+                <label for="bio">Bio</label>
+                <textarea id="bio" placeholder="A short bio..."></textarea>
+            </div>
+            <div class="field" style="margin-top: 10px;">
+                <label for="password">Password</label>
+                <input id="password" type="password" placeholder="••••••••" />
+            </div>
+            <div class="field" style="margin-top: 10px;">
+                <label for="confirmPassword">Confirm Password</label>
+                <input id="confirmPassword" type="password" placeholder="••••••••" />
+            </div>
+            <button onclick="createUser()">Create User</button>
+            <div id="status" class="status"></div>
+        </div>
+
+        <div class="card">
+            <h2>All Users</h2>
+            <div class="table-wrap" id="usersTable">
+                <div class="skeleton" style="width: 60%; margin-bottom: 8px;"></div>
+                <div class="skeleton" style="width: 90%; margin-bottom: 8px;"></div>
+                <div class="skeleton" style="width: 75%;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const GET_USERS_URL = '/users/api/get_users/';
+const CREATE_USER_URL = '/users/api/create_user/';
+
+async function fetchUsers() {
+    const container = document.getElementById('usersTable');
+    try {
+        const res = await fetch(GET_USERS_URL);
+        if (!res.ok) throw new Error('Failed to load users');
+        const data = await res.json();
+        const users = data.Users || [];
+        if (!users.length) {
+            container.innerHTML = '<p style="color:#9aa4b5;">No users found.</p>';
+            return;
+        }
+        container.innerHTML = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Username</th>
+                        <th>Bio</th>
+                        <th>Verified</th>
+                        <th>Moderator</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${users.map(u => `
+                        <tr>
+                            <td>${u.id}</td>
+                            <td>${u.first_name ? escapeHtml(u.first_name) : '<span style="color:#586070;">—</span>'}</td>
+                            <td>${u.last_name ? escapeHtml(u.last_name) : '<span style="color:#586070;">—</span>'}</td>
+                            <td>${escapeHtml(u.username)}</td>
+                            <td>${u.bio ? escapeHtml(u.bio) : '<span style="color:#586070;">—</span>'}</td>
+                            <td>${u.is_verified ? '<span class="pill ok">Yes</span>' : '<span class="pill muted">No</span>'}</td>
+                            <td>${u.is_moderator ? '<span class="pill ok">Yes</span>' : '<span class="pill muted">No</span>'}</td>
+                        </tr>`).join('')}
+                </tbody>
+            </table>
+        `;
+    } catch (err) {
+        container.innerHTML = `<p style="color:#ff9b9b;">${err.message}</p>`;
+    }
+}
+
+async function createUser() {
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const bio = document.getElementById('bio').value.trim();
+
+    // Validation
+    if (!firstName || !lastName || !username || !email || !password || !confirmPassword) {
+        showStatus('Please fill all required fields.', true);
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        showStatus('Passwords do not match.', true);
+        return;
+    }
+
+    if (password.length < 6) {
+        showStatus('Password must be at least 6 characters.', true);
+        return;
+    }
+
+    try {
+        const res = await fetch(CREATE_USER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                first_name: firstName,
+                last_name: lastName,
+                username, 
+                email, 
+                password, 
+                bio 
+            })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+            const msg = data.message || data.error || 'Failed to create user';
+            throw new Error(msg);
+        }
+
+        showStatus('User created successfully.', false);
+        document.getElementById('firstName').value = '';
+        document.getElementById('lastName').value = '';
+        document.getElementById('username').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+        document.getElementById('confirmPassword').value = '';
+        document.getElementById('bio').value = '';
+        fetchUsers();
+    } catch (err) {
+        showStatus(err.message, true);
+    }
+}
+
+function showStatus(msg, isError) {
+    const el = document.getElementById('status');
+    el.textContent = msg;
+    el.className = `status ${isError ? 'err' : 'ok'}`;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+fetchUsers();
+</script>
+</body>
+</html>

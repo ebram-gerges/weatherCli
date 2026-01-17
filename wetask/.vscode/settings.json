@@ -1,0 +1,11 @@
+{
+	"sqltools.useNodeRuntime": true,
+	"sqltools.connections": [
+		{
+			"previewLimit": 100,
+			"driver": "SQLite",
+			"name": "wetask",
+			"database": "${workspaceFolder:wetask}/db.sqlite3"
+		}
+	]
+}
